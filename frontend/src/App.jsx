@@ -101,20 +101,28 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [experiences, setExperiences] = useState([]);
+  const [about, setAbout] = useState({ name: '', title: '', bio: '', location: '' });
 
-useEffect(() => {
-  fetch('http://localhost:3001/api/projects')
-    .then((res) => res.json())
-    .then((data) => setProjects(data))
-    .catch((err) => console.error('Projects fetch error:', err));
-}, []);
+  useEffect(() => {
+    fetch('http://localhost:3001/api/projects')
+      .then((res) => res.json())
+      .then((data) => setProjects(data))
+      .catch((err) => console.error('Projects fetch error:', err));
+  }, []);
 
-useEffect(() => {
-  fetch('http://localhost:3001/api/experiences')
-    .then((res) => res.json())
-    .then((data) => setExperiences(data))
-    .catch((err) => console.error('Experiences fetch error:', err));
-}, []);
+  useEffect(() => {
+    fetch('http://localhost:3001/api/experiences')
+      .then((res) => res.json())
+      .then((data) => setExperiences(data))
+      .catch((err) => console.error('Experiences fetch error:', err));
+  }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/api/about')
+      .then((res) => res.json())
+      .then((data) => setAbout(data))
+      .catch((err) => console.error('About fetch error:', err));
+  }, []);
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -155,14 +163,18 @@ useEffect(() => {
         <div className="container hero-inner">
           <div className="hero-copy" id="about">
             <p className="eyebrow">Hello, I&apos;m</p>
+            
+              <h1 key={about.name}>
+                <strong>{about.name.split(' ')[0]}</strong> <strong>{about.name.split(' ')[1]}</strong>
+              <br />
+              <span>{about.title.split(' ')[0] + " "}</span>
+              <em>{about.titleExplanation}</em>
+              <span>{" "  + about.title.split(' ')[1]}</span>
+                <br />
+                Based in <strong>{about.location}</strong>
+              </h1>
+            
 
-            <h1>
-              Hüsna <strong>Bosun.</strong>
-              <br />
-              <span>QA</span> <em>Engineer</em>
-              <br />
-              Based in <strong>Türkiye.</strong>
-            </h1>
 
             <p className="intro">
               QA olarak internship yapıyorum, aynı zamanda backend development
@@ -233,22 +245,22 @@ useEffect(() => {
 
           <div className="experience-list">
             {experiences.map((exp) => (
-            <article className="experience-card featured-experience" key={exp.id}>
-              <div className="company-logo google-logo">G</div>
+              <article className="experience-card featured-experience" key={exp.id}>
+                <div className="company-logo google-logo">G</div>
 
-              <div className="experience-content">
-                <div className="experience-title-row">
+                <div className="experience-content">
+                  <div className="experience-title-row">
                     <h3>{exp.role}</h3>
                     <h3>{exp.company}</h3>
-                  <span>{exp.start_date} - {exp.end_date}</span>
-                </div>
+                    <span>{exp.start_date} - {exp.end_date}</span>
+                  </div>
 
                   <p>
                     {exp.description}
-                </p>
-              </div>
+                  </p>
+                </div>
               </article>
-              ))}
+            ))}
           </div>
         </div>
       </section>
@@ -268,7 +280,7 @@ useEffect(() => {
               <article className="project-card" key={project.url || index}>
                 <div className="project-number">{
                   String(index + 1).padStart(2, '0')
-                  }</div>
+                }</div>
 
                 <div className="project-card-content">
                   <h3>{project.name}</h3>
