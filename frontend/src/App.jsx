@@ -1,17 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 const skills = [
   { name: 'Git', mark: '◆', tone: 'light' },
   { name: 'Javascript', mark: 'JS', tone: 'dark' },
-  { name: 'Sass/Scss', mark: 'Sass', tone: 'light' },
   { name: 'Nest.Js', mark: '✦', tone: 'light' },
-  { name: 'Storybook', mark: 'S', tone: 'dark' },
   { name: 'React', mark: '⚛', tone: 'light' },
   { name: 'TypeScript', mark: 'TS', tone: 'dark' },
-  { name: 'Socket.Io', mark: '◉', tone: 'light' },
   { name: 'Next.Js', mark: 'N', tone: 'dark' },
-  { name: 'Figma', mark: 'F', tone: 'light' },
 ];
 
 const Icon = ({ name, size = 16 }) => {
@@ -96,38 +92,30 @@ const Icon = ({ name, size = 16 }) => {
 };
 
 const socialLinks = [
-  { label: 'GitHub', href: 'https://github.com', icon: 'github' },
-  { label: 'LinkedIn', href: 'https://linkedin.com', icon: 'linkedin' },
-  { label: 'Twitter', href: 'https://twitter.com', icon: 'twitter' },
-  { label: 'Email', href: 'mailto:hello@evrenshah.dev', icon: 'mail' },
-];
-
-const projects = [
-  {
-    number: '01',
-    title: 'E-commerce Dashboard',
-    description:
-      'A clean analytics dashboard for tracking sales, customers, and product performance.',
-    tags: ['React', 'JavaScript', 'CSS'],
-  },
-  {
-    number: '02',
-    title: 'Design System',
-    description:
-      'A flexible collection of reusable components built for consistent digital products.',
-    tags: ['Storybook', 'Figma', 'Sass'],
-  },
-  {
-    number: '03',
-    title: 'Travel Experience',
-    description:
-      'An editorial travel platform that turns destination discovery into an enjoyable journey.',
-    tags: ['Next.Js', 'TypeScript', 'UI/UX'],
-  },
+  { label: 'GitHub', href: 'https://github.com/husnabosun', icon: 'github' },
+  { label: 'LinkedIn', href: 'www.linkedin.com/in/husnabosun', icon: 'linkedin' },
+  { label: 'Email', href: 'mailto:bosunhusna@gmail.com', icon: 'mail' },
 ];
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [experiences, setExperiences] = useState([]);
+
+useEffect(() => {
+  fetch('http://localhost:3001/api/projects')
+    .then((res) => res.json())
+    .then((data) => setProjects(data))
+    .catch((err) => console.error('Projects fetch error:', err));
+}, []);
+
+useEffect(() => {
+  fetch('http://localhost:3001/api/experiences')
+    .then((res) => res.json())
+    .then((data) => setExperiences(data))
+    .catch((err) => console.error('Experiences fetch error:', err));
+}, []);
+
   const closeMenu = () => setMenuOpen(false);
 
   return (
@@ -244,41 +232,23 @@ function App() {
           </div>
 
           <div className="experience-list">
-            <article className="experience-card featured-experience">
+            {experiences.map((exp) => (
+            <article className="experience-card featured-experience" key={exp.id}>
               <div className="company-logo google-logo">G</div>
 
               <div className="experience-content">
                 <div className="experience-title-row">
-                  <h3>Software Engineer at Google</h3>
-                  <span>Nov 2019 - Present</span>
+                    <h3>{exp.role}</h3>
+                    <h3>{exp.company}</h3>
+                  <span>{exp.start_date} - {exp.end_date}</span>
                 </div>
 
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                  labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco labo
-                  ris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-                  officia deserunt mollit anim id est laborum.
+                  <p>
+                    {exp.description}
                 </p>
               </div>
-            </article>
-
-            <article className="experience-card">
-              <div className="company-logo youtube-logo">▶</div>
-
-              <div className="experience-content">
-                <div className="experience-title-row">
-                  <h3>Software Engineer at YouTube</h3>
-                  <span>Jan 2017 - Oct 2019</span>
-                </div>
-
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                  labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                  nisi ut aliquip ex ea commodo consequat.
-                </p>
-              </div>
-            </article>
+              </article>
+              ))}
           </div>
         </div>
       </section>
@@ -294,26 +264,30 @@ function App() {
           </div>
 
           <div className="projects-grid">
-            {projects.map((project) => (
-              <article className="project-card" key={project.number}>
-                <div className="project-number">{project.number}</div>
+            {projects.map((project, index) => (
+              <article className="project-card" key={project.url || index}>
+                <div className="project-number">{
+                  String(index + 1).padStart(2, '0')
+                  }</div>
 
                 <div className="project-card-content">
-                  <h3>{project.title}</h3>
+                  <h3>{project.name}</h3>
 
-                  <p>{project.description}</p>
+                  <p>{project.note || project.description || 'No description available.'}</p>
 
                   <div className="project-tags">
-                    {project.tags.map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
+                    {project.language && <span>{project.language}</span>}
+                    {project.stars > 0 && <span>⭐ {project.stars}</span>}
+                    {project.featured && <span>Featured</span>}
                   </div>
                 </div>
 
                 <a
                   className="project-link"
-                  href="#contact"
-                  aria-label={`Learn more about ${project.title}`}
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Learn more about ${project.name}`}
                 >
                   <Icon name="arrow" size={18} />
                 </a>

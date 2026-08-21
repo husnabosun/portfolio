@@ -1,5 +1,9 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 const app = express();
 
 app.use(cors());
@@ -24,16 +28,36 @@ let myProjectNotes = {
   }
 };
 
-app.get('/', (req, res) => {
-  res.send('Portfolio API is running!');
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+app.get('/api/experiences', async (req, res) => {
+  try {
+    const {data, error } = await supabase
+      .from('experiences')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    console.error('Supabase error:', error.message);
+    res.status(500).json({ error: 'Data could not be fetched' });
+  }
 });
+
+app.listen(3001, () => console.log('Backend running on port 3001'));
+
 
 app.get('/api/projects', async (req, res) => {
   try {
-    const response = await fetch('https://api.github.com/users/husnabosun/repos');
+    const response = await fetch('https://api.github.com/users/husnabosun/repos' );
     const repos = await response.json();
 
-    const enrichedRepos = repos.map(repo => {
+    const enrichedRepos = repos
+      .filter(repo => repo.topics && repo.topics.includes('portfolio'))
+      .map(repo => {
       const myNote = myProjectNotes[repo.name];
       return {
         name: repo.name,
@@ -52,4 +76,4 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
-module.exports = app;
+export default app;
