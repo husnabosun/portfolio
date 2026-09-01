@@ -11,9 +11,9 @@ app.use(express.json());
 
 let aboutMe = {
   name: "Hüsna Bosun",
-  title: "QA Engineer | Aspiring Backend Developer",
-  bio: "QA olarak internship yapıyorum, aynı zamanda backend development ve test otomasyonu üzerine kendimi geliştiriyorum.",
-  location: "İzmir, Türkiye"
+  title: "Computer Engineering Student",
+  bio: "Interning as a QA Engineer, sharpening my backend development and test automation skills along the way.",
+  location: "Türkiye"
 };
 
 app.get('/api/about', (req, res) => {
@@ -37,7 +37,7 @@ app.get('/api/experiences', async (req, res) => {
     const {data, error } = await supabase
       .from('experiences')
       .select('*')
-      .order('id', { ascending: false });
+      .order('start_date', { ascending: false });
 
     if (error) throw error;
     res.json(data);
@@ -47,13 +47,29 @@ app.get('/api/experiences', async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log('Backend running on port 3001'));
-
-
 app.get('/api/projects', async (req, res) => {
   try {
-    const response = await fetch('https://api.github.com/users/husnabosun/repos' );
-    const repos = await response.json();
+    const response = await fetch(
+      'https://api.github.com/users/husnabosun/repos?per_page=100',
+      {
+        headers: {
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'husnabosun-portfolio',
+        },
+        signal: AbortSignal.timeout(10000),
+      },
+    );
+    const responseBody = await response.text();
+
+    if (!response.ok) {
+      throw new Error(`GitHub API returned ${response.status}`);
+    }
+
+    const repos = JSON.parse(responseBody);
+
+    if (!Array.isArray(repos)) {
+      throw new Error('GitHub API returned an invalid repository list');
+    }
 
     const enrichedRepos = repos
       .filter(repo => repo.topics && repo.topics.includes('portfolio'))
@@ -72,6 +88,7 @@ app.get('/api/projects', async (req, res) => {
 
     res.json(enrichedRepos);
   } catch (error) {
+    console.error('Projects fetch error:', error.message);
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
 });

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 const skills = [
@@ -97,17 +97,141 @@ const socialLinks = [
   { label: 'Email', href: 'mailto:bosunhusna@gmail.com', icon: 'mail' },
 ];
 
+const SKILLS_SPEED_PX_PER_FRAME = 0.5;
+
+const SkillsMarquee = ({ skills: items }) => {
+  const trackRef = useRef(null);
+  const offsetRef = useRef(0);
+  const loopWidthRef = useRef(0);
+  const draggingRef = useRef(false);
+  const hoveringRef = useRef(false);
+  const pointerStartXRef = useRef(0);
+  const startOffsetRef = useRef(0);
+  const reducedMotionRef = useRef(false);
+
+  const doubledItems = [...items, ...items];
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return undefined;
+
+    reducedMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const measure = () => {
+      loopWidthRef.current = track.scrollWidth / 2;
+    };
+    measure();
+
+    let rafId;
+
+    const applyTransform = () => {
+      const loopWidth = loopWidthRef.current;
+      if (loopWidth > 0) {
+        let normalized = offsetRef.current % loopWidth;
+        if (normalized < 0) normalized += loopWidth;
+        offsetRef.current = normalized;
+      }
+      track.style.transform = `translateX(${-offsetRef.current}px)`;
+    };
+
+    const tick = () => {
+      if (!draggingRef.current && !hoveringRef.current && !reducedMotionRef.current) {
+        offsetRef.current += SKILLS_SPEED_PX_PER_FRAME;
+      }
+      applyTransform();
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+
+    const handleResize = () => measure();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const handlePointerDown = (event) => {
+    draggingRef.current = true;
+    pointerStartXRef.current = event.clientX;
+    startOffsetRef.current = offsetRef.current;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.currentTarget.classList.add('is-dragging');
+  };
+
+  const handlePointerMove = (event) => {
+    if (!draggingRef.current) return;
+    const delta = event.clientX - pointerStartXRef.current;
+    offsetRef.current = startOffsetRef.current - delta;
+  };
+
+  const endDrag = (event) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    event.currentTarget.classList.remove('is-dragging');
+  };
+
+  return (
+    <div
+      className="skills-marquee"
+      onMouseEnter={() => {
+        hoveringRef.current = true;
+      }}
+      onMouseLeave={() => {
+        hoveringRef.current = false;
+      }}
+    >
+      <div
+        className="skills-track"
+        ref={trackRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endDrag}
+        onPointerLeave={endDrag}
+        onPointerCancel={endDrag}
+      >
+        {doubledItems.map((skill, index) => (
+          <div
+            className={`skill-card ${skill.tone}`}
+            key={`${skill.name}-${index}`}
+          >
+            <span className="skill-mark">{skill.mark}</span>
+            <span>{skill.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const formatExperienceDate = (value) => {
+  if (!value) return 'Present';
+  if (typeof value === 'string' && value.toLowerCase() === 'present') return 'Present';
+
+  const date = new Date(`${String(value)}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    year: 'numeric',
+  }).format(date);
+};
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [projects, setProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
   const [experiences, setExperiences] = useState([]);
   const [about, setAbout] = useState({ name: '', title: '', bio: '', location: '' });
 
   useEffect(() => {
     fetch('http://localhost:3001/api/projects')
       .then((res) => res.json())
-      .then((data) => setProjects(data))
-      .catch((err) => console.error('Projects fetch error:', err));
+      .then((data) => setProjects(Array.isArray(data) ? data : []))
+      .catch((err) => console.error('Projects fetch error:', err))
+      .finally(() => setProjectsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -122,6 +246,46 @@ function App() {
       .then((res) => res.json())
       .then((data) => setAbout(data))
       .catch((err) => console.error('About fetch error:', err));
+  }, []);
+
+  useEffect(() => {
+    const revealEls = Array.from(document.querySelectorAll('.reveal'));
+    if (!revealEls.length) return undefined;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      revealEls.forEach((el) => el.classList.add('is-visible'));
+      return undefined;
+    }
+
+    // Track which elements have already received an observer callback so we only
+    // skip the "page load" animation for sections that were visible on the very
+    // first (async, layout-settled) measurement instead of a synchronous check.
+    const seen = new WeakSet();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const el = entry.target;
+          const isFirstCallback = !seen.has(el);
+          seen.add(el);
+
+          if (!entry.isIntersecting) return;
+
+          if (isFirstCallback) {
+            el.classList.add('is-visible', 'reveal-instant');
+          } else {
+            el.classList.add('is-visible');
+          }
+          observer.unobserve(el);
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -60px 0px' }
+    );
+
+    revealEls.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
   }, []);
 
   const closeMenu = () => setMenuOpen(false);
@@ -159,17 +323,16 @@ function App() {
       </header>
 
       {/* HERO - FULL WIDTH */}
-      <section className="hero" id="top">
+      <section className="hero reveal" id="top">
         <div className="container hero-inner">
           <div className="hero-copy" id="about">
             <p className="eyebrow">Hello, I&apos;m</p>
             
               <h1 key={about.name}>
-                <strong>{about.name.split(' ')[0]}</strong> <strong>{about.name.split(' ')[1]}</strong>
+                <strong className="hero-name">{about.name.split(' ')[0]}</strong>{' '}
+                <strong className="hero-name">{about.name.split(' ')[1]}</strong>
               <br />
-              <span>{about.title.split(' ')[0] + " "}</span>
-              <em>{about.titleExplanation}</em>
-              <span>{" "  + about.title.split(' ')[1]}</span>
+              <span>{about.title}</span>
                 <br />
                 Based in <strong>{about.location}</strong>
               </h1>
@@ -217,27 +380,17 @@ function App() {
         </div>
       </section>
 
-      <section className="skills-section" id="skills">
+      <section className="skills-section reveal" id="skills">
         <div className="container">
           <div className="section-heading">
             <span>My</span> Skills
           </div>
 
-          <div className="skills-grid">
-            {skills.map((skill) => (
-              <div
-                className={`skill-card ${skill.tone}`}
-                key={skill.name}
-              >
-                <span className="skill-mark">{skill.mark}</span>
-                <span>{skill.name}</span>
-              </div>
-            ))}
-          </div>
+          <SkillsMarquee skills={skills} />
         </div>
       </section>
 
-      <section className="experience-section" id="experience">
+      <section className="experience-section reveal" id="experience">
         <div className="container">
           <div className="section-heading light-heading">
             My <span>Experience</span>
@@ -245,14 +398,31 @@ function App() {
 
           <div className="experience-list">
             {experiences.map((exp) => (
-              <article className="experience-card featured-experience" key={exp.id}>
-                <div className="company-logo google-logo">G</div>
+              <article className="experience-card featured-experience reveal-item" key={exp.id}>
+                <div className="company-logo">
+                  {exp.logo_url ? (
+                    <a
+                      href={exp.company_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Visit ${exp.company}`}
+                    >
+                      <img src={exp.logo_url} alt={`${exp.company} logo`} />
+                    </a>
+                  ) : (
+                    exp.company?.charAt(0)
+                  )}
+                </div>
 
                 <div className="experience-content">
                   <div className="experience-title-row">
-                    <h3>{exp.role}</h3>
-                    <h3>{exp.company}</h3>
-                    <span>{exp.start_date} - {exp.end_date}</span>
+                    <div className="experience-role-company">
+                      <h3>{exp.company}</h3>
+                      <h3>{exp.role}</h3>                
+                    </div>
+                    <span>
+                      {formatExperienceDate(exp.start_date)} - {formatExperienceDate(exp.end_date)}
+                    </span>
                   </div>
 
                   <p>
@@ -265,7 +435,7 @@ function App() {
         </div>
       </section>
 
-      <section className="projects-section" id="projects">
+      <section className="projects-section reveal" id="projects">
         <div className="container">
           <div className="projects-heading-row">
             <div className="section-heading projects-heading">
@@ -276,8 +446,15 @@ function App() {
           </div>
 
           <div className="projects-grid">
-            {projects.map((project, index) => (
-              <article className="project-card" key={project.url || index}>
+            {projectsLoading ? (
+              <div className="projects-loading" role="status" aria-label="Loading projects">
+                <span className="loading-spinner" />
+                <div className="project-skeleton" />
+                <div className="project-skeleton" />
+                <div className="project-skeleton" />
+              </div>
+            ) : projects.map((project, index) => (
+              <article className="project-card reveal-item" key={project.url || index}>
                 <div className="project-number">{
                   String(index + 1).padStart(2, '0')
                 }</div>
@@ -310,7 +487,7 @@ function App() {
       </section>
 
       {/* CONTACT - FULL WIDTH */}
-      <section className="contact-section" id="contact">
+      <section className="contact-section reveal" id="contact">
         <div className="container contact-inner">
           <div>
             <p className="eyebrow">Have a project in mind?</p>
