@@ -9,7 +9,7 @@ const skills = [
 
 const socialLinks = [
   { label: 'GitHub', href: 'https://github.com/husnabosun', icon: 'github' },
-  { label: 'LinkedIn', href: 'www.linkedin.com/in/husnabosun', icon: 'linkedin' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/husnabosun/', icon: 'linkedin' },
   { label: 'Email', href: 'mailto:bosunhusna@gmail.com', icon: 'mail' },
 ];
 

@@ -64,7 +64,7 @@ function Header() {
             <a className={activeSection === 'projects' ? 'is-active' : ''} href="#projects" onClick={closeMenu}>Projects</a>
             <a className={activeSection === 'contact' ? 'is-active' : ''} href="#contact" onClick={closeMenu}>Contact Me</a>
 
-            <a className="resume-button" href="../../public/files/resume.pdf" target="_blank" rel="noreferrer" onClick={closeMenu}>
+            <a className="resume-button" href="/files/resume.pdf" target="_blank" rel="noreferrer" onClick={closeMenu}>
               Resume <Icon name="download" size={13} />
             </a>
           </div>
