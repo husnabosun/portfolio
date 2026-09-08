@@ -6,7 +6,21 @@ import dotenv from 'dotenv';
 dotenv.config();
 const app = express();
 
-app.use(cors({ origin: process.env.FRONTEND_URL }));
+const allowedOrigins = [
+  'https://husnabosun.fyi',
+  'https://www.husnabosun.fyi',
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.use(express.json());
 
 let aboutMe = {
