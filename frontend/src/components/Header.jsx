@@ -8,7 +8,7 @@ function Header() {
   const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
-    const sectionIds = ['about', 'skills', 'experience', 'projects', 'contact'];
+    const sectionIds = ['about', 'skills', 'experience', 'education', 'projects', 'contact'];
     const sections = sectionIds
       .map((sectionId) => document.getElementById(sectionId))
       .filter(Boolean);
@@ -60,10 +60,11 @@ function Header() {
             <a className={activeSection === 'about' ? 'is-active' : ''} href="#about" onClick={closeMenu}>About Me</a>
             <a className={activeSection === 'skills' ? 'is-active' : ''} href="#skills" onClick={closeMenu}>Skills</a>
             <a className={activeSection === 'experience' ? 'is-active' : ''} href="#experience" onClick={closeMenu}>Experience</a>
+            <a className={activeSection === 'education' ? 'is-active' : ''} href="#education" onClick={closeMenu}>Education</a>
             <a className={activeSection === 'projects' ? 'is-active' : ''} href="#projects" onClick={closeMenu}>Projects</a>
             <a className={activeSection === 'contact' ? 'is-active' : ''} href="#contact" onClick={closeMenu}>Contact Me</a>
 
-            <a className="resume-button" href="#contact" onClick={closeMenu}>
+            <a className="resume-button" href="../../public/files/resume.pdf" target="_blank" rel="noreferrer" onClick={closeMenu}>
               Resume <Icon name="download" size={13} />
             </a>
           </div>

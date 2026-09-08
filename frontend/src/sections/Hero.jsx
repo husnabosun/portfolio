@@ -14,8 +14,7 @@ function Hero({ about, socialLinks, Icon }) {
           </h1>
 
           <p className="intro">
-            QA olarak internship yapıyorum, aynı zamanda backend development
-            ve test otomasyonu üzerine kendimi geliştiriyorum.
+            {about.description}
           </p>
 
           <div className="social-row" aria-label="Social links">

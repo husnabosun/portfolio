@@ -5,6 +5,7 @@ import Footer from './components/Footer.jsx';
 import Icon from './components/Icon.jsx';
 import Skills from './sections/Skills.jsx';
 import Experiences from './sections/Experiences.jsx';
+import Education from './sections/Education.jsx';
 import Projects from './sections/Projects.jsx';
 import Contact from './sections/Contact.jsx';
 import Hero from './sections/Hero.jsx';
@@ -90,6 +91,7 @@ function App() {
       <Header closeMenu={closeMenu} />
       <Hero about={about} socialLinks={socialLinks} Icon={Icon} />
       <Skills skills={skills} />
+      <Education />
       <Experiences experiences={experiences} formatExperienceDate={formatExperienceDate} />
       <Projects projects={projects} projectsLoading={projectsLoading} />
       <Contact />

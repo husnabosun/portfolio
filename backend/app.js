@@ -13,24 +13,41 @@ let aboutMe = {
   name: "Hüsna Bosun",
   title: "Computer Engineering Student",
   bio: "Interning as a QA Engineer, sharpening my backend development and test automation skills along the way.",
-  location: "Türkiye"
+  location: "Türkiye",
+  description : "I'm focused on building reliable software, improving how systems work, and turning everyday problems into practical tools. My experience spans software QA, backend development, and test automation, with a strong interest in understanding systems end to end and making them better."
+  
 };
 
 app.get('/api/about', (req, res) => {
   res.json(aboutMe);
 });
 
-
 let myProjectNotes = {
   "task-api": {
-    note: "İlk backend projem, QA'dan dev'e geçiş için yaptım. Test suite yazarken 2 gerçek bug buldum.",
+    note: "This portfolio website showcases my skills and projects, built with React and Supabase.",
     featured: true
   }
 };
 
+
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+app.get('/api/education', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('education')
+      .select('*')
+      .order('start_date', { ascending: false });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    console.error('Supabase error:', error.message);
+    res.status(500).json({ error: 'Data could not be fetched' });
+  }
+});
 
 app.get('/api/experiences', async (req, res) => {
   try {
@@ -47,6 +64,7 @@ app.get('/api/experiences', async (req, res) => {
   }
 });
 
+
 app.get('/api/projects', async (req, res) => {
   try {
     const response = await fetch(
@@ -55,6 +73,7 @@ app.get('/api/projects', async (req, res) => {
         headers: {
           Accept: 'application/vnd.github+json',
           'User-Agent': 'husnabosun-portfolio',
+          ...(process.env.GITHUB_TOKEN && { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }),
         },
         signal: AbortSignal.timeout(10000),
       },

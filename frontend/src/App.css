@@ -130,8 +130,7 @@ a {
 .hero {
   width: 100%;
   background: #fff;
-  min-height: 570px;
-  padding: 32px 0 88px;
+  padding: 32px 0 40px;
   scroll-margin-top: 84px;
 }
 
@@ -145,7 +144,6 @@ a {
 .hero-inner {
   display: flex;
   align-items: center;
-  min-height: 400px;
 }
 
 .hero-copy {
@@ -238,7 +236,7 @@ a {
 
 .skills-section {
   width: 100%;
-  padding: 58px 0 71px;
+  padding: 32px 0 71px;
   background: #fff;
 }
 
@@ -492,6 +490,156 @@ a {
   font-size: 11px;
   line-height: 1.55;
   text-align: left;
+}
+
+/* EDUCATION */
+
+.education-section {
+  width: 100%;
+  padding: 60px 0 74px;
+  background: #fff;
+  color: var(--ink);
+  scroll-margin-top: 84px;
+}
+
+.education-timeline {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: 36px;
+}
+
+.education-timeline::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 5px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(63, 32, 42, 0.12), var(--ink), rgba(63, 32, 42, 0.12));
+  border-radius: 2px;
+}
+
+.education-item {
+  position: relative;
+  padding-bottom: 28px;
+}
+
+.education-item:last-child {
+  padding-bottom: 0;
+}
+
+.education-dot {
+  position: absolute;
+  top: 8px;
+  left: -36px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow:
+    0 0 0 4px rgba(63, 32, 42, 0.12),
+    0 0 12px 2px rgba(63, 32, 42, 0.55);
+}
+
+.education-card {
+  padding: 20px 22px;
+  border: 1px solid rgba(63, 32, 42, 0.35);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow:
+    0 4px 18px rgba(63, 32, 42, 0.12),
+    0 0 22px rgba(63, 32, 42, 0.08);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.education-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ink);
+  box-shadow:
+    0 6px 22px rgba(63, 32, 42, 0.2),
+    0 0 26px rgba(63, 32, 42, 0.15);
+}
+
+.education-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.school-logo {
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(63, 32, 42, 0.08);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.school-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.education-title-group {
+  text-align: left;
+}
+
+.education-title-group h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.education-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.education-degree {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(63, 32, 42, 0.7);
+}
+
+.education-dates {
+  font-size: 10px;
+  color: rgba(63, 32, 42, 0.55);
+  white-space: nowrap;
+}
+
+.education-description {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: rgba(63, 32, 42, 0.65);
+  text-align: left;
+}
+
+.education-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.education-error {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(63, 32, 42, 0.7);
 }
 
 /* PROJECTS */
@@ -838,6 +986,26 @@ a {
   .experience-title-row span {
     display: block;
     margin-top: 8px;
+  }
+
+  /* EDUCATION */
+
+  .education-section {
+    padding: 51px 0 60px;
+  }
+
+  .education-timeline {
+    padding-left: 28px;
+  }
+
+  .education-dot {
+    left: -28px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .education-card {
+    padding: 16px 18px;
   }
 
   /* PROJECTS */
