@@ -231,6 +231,64 @@ a {
   transform: translateY(-3px);
 }
 
+.hero-skeleton {
+  width: min(100%, 720px);
+}
+
+.hero-skeleton-line {
+  display: block;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(63, 32, 42, 0.1);
+  animation: hero-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.hero-skeleton-eyebrow {
+  width: 90px;
+  height: 14px;
+  margin-bottom: 20px;
+}
+
+.hero-skeleton-title {
+  width: 80%;
+  height: 32px;
+  margin-bottom: 14px;
+}
+
+.hero-skeleton-title-short {
+  width: 55%;
+  margin-bottom: 28px;
+}
+
+.hero-skeleton-intro {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.hero-skeleton-intro-short {
+  width: 65%;
+  margin-bottom: 27px;
+}
+
+.hero-skeleton-social {
+  display: flex;
+  gap: 13px;
+}
+
+.hero-skeleton-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  background: rgba(63, 32, 42, 0.1);
+  animation: hero-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes hero-skeleton-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
 
 /* SKILLS */
 

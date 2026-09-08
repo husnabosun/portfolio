@@ -21,6 +21,7 @@ function App() {
   const [projectsLoading, setProjectsLoading] = useState(true);
   const [experiences, setExperiences] = useState([]);
   const [about, setAbout] = useState({ name: '', title: '', bio: '', location: '' });
+  const [aboutLoading, setAboutLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${API_URL}/api/projects`)
@@ -41,7 +42,8 @@ function App() {
     fetch(`${API_URL}/api/about`)
       .then((res) => res.json())
       .then((data) => setAbout(data))
-      .catch((err) => console.error('About fetch error:', err));
+      .catch((err) => console.error('About fetch error:', err))
+      .finally(() => setAboutLoading(false));
   }, []);
 
   useEffect(() => {
@@ -89,7 +91,7 @@ function App() {
   return (
     <div className="site-shell">
       <Header closeMenu={closeMenu} />
-      <Hero about={about} socialLinks={socialLinks} Icon={Icon} />
+      <Hero about={about} aboutLoading={aboutLoading} socialLinks={socialLinks} Icon={Icon} />
       <Skills skills={skills} />
       <Education />
       <Experiences experiences={experiences} formatExperienceDate={formatExperienceDate} />
