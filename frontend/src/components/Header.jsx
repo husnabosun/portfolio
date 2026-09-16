@@ -58,9 +58,9 @@ function Header() {
 
           <div className={`nav-links ${menuOpen ? 'is-open' : ''}`}>
             <a className={activeSection === 'about' ? 'is-active' : ''} href="#about" onClick={closeMenu}>About Me</a>
-            <a className={activeSection === 'skills' ? 'is-active' : ''} href="#skills" onClick={closeMenu}>Skills</a>
+          <a className={activeSection === 'skills' ? 'is-active' : ''} href="#skills" onClick={closeMenu}>Skills</a>
+          <a className={activeSection === 'education' ? 'is-active' : ''} href="#education" onClick={closeMenu}>Education</a>
             <a className={activeSection === 'experience' ? 'is-active' : ''} href="#experience" onClick={closeMenu}>Experience</a>
-            <a className={activeSection === 'education' ? 'is-active' : ''} href="#education" onClick={closeMenu}>Education</a>
             <a className={activeSection === 'projects' ? 'is-active' : ''} href="#projects" onClick={closeMenu}>Projects</a>
             <a className={activeSection === 'contact' ? 'is-active' : ''} href="#contact" onClick={closeMenu}>Contact Me</a>
 
