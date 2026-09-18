@@ -50,10 +50,12 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.get('/api/education', async (req, res) => {
   try {
+    console.time('supabase:education');
     const { data, error } = await supabase
       .from('education')
       .select('*')
       .order('start_date', { ascending: false });
+    console.timeEnd('supabase:education');
 
     if (error) throw error;
     res.json(data);
@@ -65,10 +67,12 @@ app.get('/api/education', async (req, res) => {
 
 app.get('/api/experiences', async (req, res) => {
   try {
+    console.time('supabase:experiences');
     const {data, error } = await supabase
       .from('experiences')
       .select('*')
       .order('start_date', { ascending: false });
+    console.timeEnd('supabase:experiences');
 
     if (error) throw error;
     res.json(data);
@@ -78,9 +82,18 @@ app.get('/api/experiences', async (req, res) => {
   }
 });
 
+// Simple in-memory cache: avoids hitting GitHub's rate-limited API on every request.
+const PROJECTS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+let projectsCache = { data: null, expiresAt: 0 };
 
 app.get('/api/projects', async (req, res) => {
   try {
+    if (projectsCache.data && projectsCache.expiresAt > Date.now()) {
+      console.log('projects: served from cache');
+      return res.json(projectsCache.data);
+    }
+
+    console.time('github:repos');
     const response = await fetch(
       'https://api.github.com/users/husnabosun/repos?per_page=100',
       {
@@ -93,6 +106,7 @@ app.get('/api/projects', async (req, res) => {
       },
     );
     const responseBody = await response.text();
+    console.timeEnd('github:repos');
 
     if (!response.ok) {
       throw new Error(`GitHub API returned ${response.status}`);
@@ -119,6 +133,7 @@ app.get('/api/projects', async (req, res) => {
       };
     });
 
+    projectsCache = { data: enrichedRepos, expiresAt: Date.now() + PROJECTS_CACHE_TTL_MS };
     res.json(enrichedRepos);
   } catch (error) {
     console.error('Projects fetch error:', error.message);
