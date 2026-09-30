@@ -12,6 +12,7 @@ import Hero from './sections/Hero.jsx';
 import formatExperienceDate from './utils.js';
 import { skills, socialLinks } from './constants.js';
 import API_URL from './config/api.js';
+import { Analytics } from '@vercel/analytics/react';
 
 
 
@@ -98,6 +99,7 @@ function App() {
       <Projects projects={projects} projectsLoading={projectsLoading} />
       <Contact />
       <Footer />
+      <Analytics />
     </div>
   );
 }
